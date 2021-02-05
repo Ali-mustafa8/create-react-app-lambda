@@ -1,50 +1,65 @@
-import React, { Component } from "react"
-import logo from "./logo.svg"
-import "./App.css"
+import React from "react";
+import Hangman from "./component/game.jsx";
+import Spinner from "./component/spinner.jsx";
+import Typewriter from "./component/typeffect.jsx";
+import "./App.css";
+import i3 from "./component/images/3.png";
+import i4 from "./component/images/4.png";
+import i5 from "./component/images/5.png";
+import i6 from "./component/images/6.png";
+import i7 from "./component/images/7.png";
+import i8 from "./component/images/8.png";
+import i9 from "./component/images/9.png";
+import i10 from "./component/images/11.png";
 
-class LambdaDemo extends Component {
+class App extends React.Component {
   constructor(props) {
-    super(props)
-    this.state = { loading: false, msg: null }
+    super(props);
+
+    this.state = {
+      word: [],
+      fetched: false,
+      poctures: [i3, i4, i5, i6, i7, i8, i9, i10],
+      try: 7,
+    };
   }
 
-  handleClick = api => e => {
-    e.preventDefault()
-
-    this.setState({ loading: true })
-    fetch("/.netlify/functions/" + api)
-      .then(response => response.json())
-      .then(json => this.setState({ loading: false, msg: json.msg }))
+  //fetching the API
+  componentDidMount() {
+    fetch("https://random-word-api.herokuapp.com/word?number=1")
+      .then((res) => res.json())
+      .then((data) => {
+        this.setState({
+          fetched: true,
+          word: data,
+        });
+      });
   }
+  //
 
   render() {
-    const { loading, msg } = this.state
-
-    return (
-      <p>
-        <button onClick={this.handleClick("hello")}>{loading ? "Loading..." : "Call Lambda"}</button>
-        <button onClick={this.handleClick("async-dadjoke")}>{loading ? "Loading..." : "Call Async Lambda"}</button>
-        <br />
-        <span>{msg}</span>
-      </p>
-    )
+    if (!this.state.fetched) {
+      return <Spinner />;
+    } else {
+      return (
+        <div className="general">
+          <div className="componenets">
+            <div className="typewriter">
+              <Typewriter />
+            </div>
+            <div className="hangman">
+              <Hangman
+                word={this.state.word}
+                letters={"abcdefghijklmnopqrstuvwxyz"}
+                img={this.state.poctures}
+                try={this.state.try}
+              />
+            </div>
+          </div>
+        </div>
+      );
+    }
   }
 }
 
-class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <LambdaDemo />
-        </header>
-      </div>
-    )
-  }
-}
-
-export default App
+export default App;
